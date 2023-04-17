@@ -1,4 +1,3 @@
-import unittest
 import requests
 import sqlite3
 import json
@@ -18,13 +17,6 @@ import matplotlib.pyplot as plt
         #ends the program
         
 #part 2: gathering data
-
-# database function
-def setUpdatabase(db_name):
-    path = os.path.dirname(os.path.abspath(__file__))
-    conn = sqlite3.connect(path+'/'+db_name)
-    cur = conn.cursor()
-    return cur, conn
 
 # load json
 def load_json(filename):
@@ -79,6 +71,40 @@ def animal_sea_cache(filename, url):
     sea = get_json_info(url)
     write_json(filename, sea)
 
+# database function
+def setUpdatabase(db_name):
+    path = os.path.dirname(os.path.abspath(__file__))
+    conn = sqlite3.connect(path+'/'+db_name)
+    cur = conn.cursor()
+    return cur, conn
+
+# create an alpha list of aquatic creatures
+def create_acnh_labels(seafile, fishfile):
+    seadict = load_json(seafile)
+    aquatic_names_list = []
+    for item in seadict:
+        all_sea_names = seadict[item].get("name")
+        english_sea_name = all_sea_names.get("name-USen")
+        english_sea_name = english_sea_name.title()
+        aquatic_names_list.append(english_sea_name)
+    fishdict = load_json(fishfile)
+    for item in fishdict:
+        all_fish_names = fishdict[item].get("name")
+        english_fish_name = all_fish_names.get("name-USen")
+        english_fish_name = english_fish_name.title()
+        aquatic_names_list.append(english_fish_name)
+        aquatic_names_list.sort()
+    return aquatic_names_list
+
+#create animal crossing table of aquatic fish names
+def create_acnh_name_table(cur, conn):
+    ACNH_aquatic_species = create_acnh_labels("sea.json", "fish.json")
+    cur.execute("DROP TABLE IF EXISTS ACNH_aquatic_species")
+    cur.execute("CREATE TABLE ACNH_aquatic_species (id INTEGER PRIMARY KEY, title TEXT)")
+    for i in range(len(ACNH_aquatic_species)):
+        cur.execute("INSERT INTO ACNH_aquatic_species (id,title) VALUES (?,?)",(i,ACNH_aquatic_species[i]))
+    conn.commit()
+
 #part 3: processing data
 
 #create table if doesnt exist
@@ -95,8 +121,6 @@ def animal_sea_cache(filename, url):
 #sleep every 10th retrieved item
 
 #part 4: visualize the data
-
-
     
 #main function
 def main():
@@ -105,8 +129,11 @@ def main():
 
     genshin_cache("genshinweapons.json", "https://api.genshin.dev/weapons")
     monster_cache("monsterweapons.json", "https://mhw-db.com/weapons")
-    animal_fish_cache("fish.json", "http://acnhapi.com/v1/fish/", "http://acnhapi.com/v1/sea/")
+    animal_fish_cache("fish.json", "http://acnhapi.com/v1/fish/")
     animal_sea_cache("sea.json", "http://acnhapi.com/v1/sea/")
-     
+    create_acnh_name_table(cur, conn)
+
+
+    
 if __name__ == "__main__":
     main()
