@@ -100,16 +100,75 @@ def create_acnh_labels(seafile, fishfile):
 def create_acnh_name_table(cur, conn):
     ACNH_aquatic_species = create_acnh_labels("sea.json", "fish.json")
     cur.execute("DROP TABLE IF EXISTS ACNH_aquatic_species")
-    cur.execute("CREATE TABLE ACNH_aquatic_species (id INTEGER PRIMARY KEY, title TEXT)")
-    for i in range(len(ACNH_aquatic_species)):
-        cur.execute("INSERT INTO ACNH_aquatic_species (id,title) VALUES (?,?)",(i,ACNH_aquatic_species[i]))
+    cur.execute("CREATE TABLE ACNH_aquatic_species (id INTEGER PRIMARY KEY, species TEXT)")
+    query = 'SELECT COUNT(*) FROM ACNH_aquatic_species;'
+    cursor = conn.cursor()
+    cursor.execute(query)
+    index = cursor.fetchone()[0]
+    print(index)
+    count = 0
+    for i in range(index, len(ACNH_aquatic_species)+1):
+        count += 1
+        if count % 26 == 0:
+            break
+        else:
+            cur.execute("INSERT INTO ACNH_aquatic_species (id,species) VALUES (?,?)",(i,ACNH_aquatic_species[i]))
     conn.commit()
 
-#part 3: processing data
+def create_monster_label(monster_file):
+    monsterdict = load_json(monster_file)
+    monster_names_list = []
+    for names in monsterdict:
+        all_weapons_f = monsterdict[names].get("rarity")
+        all_weapons = all_weapons_f.title()
+        monster_names_list.append(all_weapons)
+        monster_names_list.sort()
+    return monster_names_list
+        
+def create_monster_name_table(cur, conn):
+    pass
+    # monster_weapons = create_monster_label("weapons.json")
+    # cur.execute("DROP TABLE IF EXISTS monster_weapons")
+    # cur.execute("CREATE TABLE monster_weapons (species )
+    # query = 'SELECT COUNT(*) FROM monster_weapons;'
+    # cursor = conn.cursor()
+    # cursor.execute(query)
+    # count = cursor.fetchone()[0]
+    # pass
+
+def create_genshin_labels(genshin_file):
+    genshindict = load_json(genshin_file)
+    genshin_names_list = []
+    for names in genshin_names_list:
+        all_names = genshindict[names].get("rarity")
+        labels = all_names.title()
+        genshin_names_list.append(labels)
+        genshin_names_list.sort()
+
+    return genshin_names_list
+
+def create_genshin_table(cur, con):
+    genshin_weapon_types = create_genshin_table("genshinweapons.json")
+    cur.execute("DROP TABLE IF EXISTS genshin_weapon_types")
+    cur.execute("CREATE TABLE genshin_weapon_types (id INTEGER PRIMARY KEY, species TEXT)")
+    q = 'SELECT COUNT(*) FROM genshin_weapon_types;'
+    cursor = con.cursor()
+    cursor.execute(q)
+    counter = 0
+    for x in range(len(genshin_weapon_types)):
+        counter += 1
+        if x == 0:
+            print()
+        pass
+
+        
+        
+#part 3: processing data (this part is just for reference for stuff we need to do )
 
 #create table if doesnt exist
 
 #read things from file
+
 
 #keep a counter of the number retrieved from API and stop at 100 ?
 
