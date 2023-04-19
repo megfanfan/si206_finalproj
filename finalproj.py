@@ -57,110 +57,59 @@ def setUpdatabase(db_name):
     cur = conn.cursor()
     return cur, conn
 
-# create a list of aquatic creature rarity
-def get_acnh_rarity(seafile, fishfile):
+#animal crossing dictionary
+def create_acnh_dictionary(fishfile, seafile):
+    fishdict = load_json(fishfile)
+    acnhdict = {}
+    for item in fishdict:
+        item_names = fishdict[item].get("name")
+        eng_name = item_names.get("name-USen")
+        eng_name = eng_name.title()
+        item_price = fishdict[item].get("price")
+        item_avail = fishdict[item].get("availability")
+        item_rarity = item_avail.get("rarity")
+        acnhdict[eng_name] = [item_price, item_rarity]
     seadict = load_json(seafile)
-    aquatic_rarity_list = []
     for item in seadict:
-        sea_speed = seadict[item].get("speed")
-        if sea_speed == "Stationary":
+        item_names = seadict[item].get("name")
+        eng_name = item_names.get("name-USen")
+        eng_name = eng_name.title()
+        item_price = seadict[item].get("price")
+        item_speed = seadict[item].get("speed")
+        if item_speed == "Stationary":
             rarity = "Common"
-        elif sea_speed == "Very slow":
+        elif item_speed == "Very slow":
             rarity = "Common"
-        elif sea_speed == "Slow":
+        elif item_speed == "Slow":
             rarity == "Common"
-        elif sea_speed == "Medium":
+        elif item_speed == "Medium":
             rarity = "Uncommon"
-        elif sea_speed == "Fast":
+        elif item_speed == "Fast":
             rarity = "Rare"
         else:
             rarity = "Ultra-rare"
-        aquatic_rarity_list.append(rarity)
-    fishdict = load_json(fishfile)
-    for item in fishdict:
-        fish_avail = fishdict[item].get("availability")
-        fish_rarity = fish_avail.get("rarity")
-        aquatic_rarity_list.append(fish_rarity)
-    print(aquatic_rarity_list)
-    return aquatic_rarity_list
-
-# create a list of aquatic creature price
-def get_prices(seafile, fishfile):
-    seadict = load_json(seafile)
-    aquatic_price_list = []
-    for item in seadict:
-        sea_price = seadict[item].get("price")
-        aquatic_price_list.append(sea_price)
-    fishdict = load_json(fishfile)
-    for item in fishdict:
-        fish_price = fishdict[item].get("price")
-        aquatic_price_list.append(fish_price)
-    print(aquatic_price_list)
-    return aquatic_price_list
+        acnhdict[eng_name] = [item_price, rarity]
+        
+    return acnhdict
 
 #create animal crossing table of aquatic creature rarity
 def create_acnh_name_table(cur, conn):
-    ACNH_aquatic_rarity = get_acnh_rarity("sea.json", "fish.json")
-    cur.execute("CREATE TABLE IF NOT EXISTS ACNH_aquatic_rarity (id INTEGER PRIMARY KEY, rarity TEXT)")
-    query = 'SELECT COUNT(*) FROM ACNH_aquatic_rarity;'
+    acnhdict = create_acnh_dictionary("fish.json", "sea.json")
+    cur.execute("CREATE TABLE IF NOT EXISTS ACNH_Aquatic_Creatures (species_id INTEGER PRIMARY KEY, species TEXT, price INTEGER, rarity TEXT)")
+    query = 'SELECT COUNT(*) FROM ACNH_Aquatic_Creatures;'
     cursor = conn.cursor()
     cursor.execute(query)
     index = cursor.fetchone()[0]
     print(index)
-    if index < 100:
-        count = 0
-        for i in range(index, len(ACNH_aquatic_rarity)+1):
-            count += 1
-            if count % 26 == 0:
-                break
-            else:
-                cur.execute("INSERT INTO ACNH_aquatic_rarity (id,rarity) VALUES (?,?)",(i,ACNH_aquatic_rarity[i]))
+    count = 0
+    for i in range(index, len(acnhdict)):
+        count += 1
+        if count % 26 == 0:
+            break
+        else:
+            allkeys = list(acnhdict.keys())
+            cur.execute("INSERT INTO ACNH_Aquatic_Creatures (species_id, species, price, rarity) VALUES (?,?,?,?)",(i+1,allkeys[i],acnhdict[allkeys[i]][0],acnhdict[allkeys[i]][1]))
     conn.commit()
-
-#create animal rossing table of aquatic creature price
-    ACNH_aquatic_price = get_prices("sea.json", "fish.json")
-    cur.execute("CREATE TABLE IF NOT EXISTS ACNH_aquatic_price (id INTEGER PRIMARY KEY, price TEXT)")
-    query = 'SELECT COUNT(*) FROM ACNH_aquatic_price;'
-    cursor = conn.cursor()
-    cursor.execute(query)
-    index = cursor.fetchone()[0]
-    print(index)
-    if index < 100:
-        count = 0
-        for i in range(index, len(ACNH_aquatic_price)+1):
-            count += 1
-            if count % 26 == 0:
-                break
-            else:
-                cur.execute("INSERT INTO ACNH_aquatic_price (id,price) VALUES (?,?)",(i,ACNH_aquatic_price[i]))
-        conn.commit()
-
-# def create_monster_label(monster_file):
-#     monsterdict = load_json(monster_file)
-#     monster_names_list = []
-#     for names in monsterdict:
-#         all_weapons_f = monsterdict[names].get("rarity")
-#         all_weapons = all_weapons_f.title()
-#         monster_names_list.append(all_weapons)
-#         monster_names_list.sort()
-#     return monster_names_list
-        
-# def create_monster_name_table(cur, conn):
-#     pass
-
-# def create_genshin_labels(genshin_file):
-#     genshindict = load_json(genshin_file)
-#     genshin_names_list = []
-#     for names in genshin_names_list:
-#         all_names = genshindict[names].get("rarity")
-#         labels = all_names.title()
-#         genshin_names_list.append(labels)
-#         genshin_names_list.sort()
-
-#     return genshin_names_list
-
-# def create_genshin_table(cur, con):
-#     pass
 
 #main function
 def main():
