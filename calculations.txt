@@ -1,0 +1,22 @@
+Animal Crossing Calculations:
+Common Aquatic creatures cost about 738.24 bells on average
+Uncommon Aquatic creatures cost about 2816.67 bells on average
+Rare Aquatic creatures cost about 7916.67 bells on average
+Ultra-rare Aquatic creatures cost about 11950.0 bells on average
+
+Monster Hunter Calculations:
+The maximum attack value is 528 for a weapon with a rarity number of 1
+The maximum attack value is 624 for a weapon with a rarity number of 2
+The maximum attack value is 720 for a weapon with a rarity number of 3
+The maximum attack value is 720 for a weapon with a rarity number of 4
+The maximum attack value is 864 for a weapon with a rarity number of 5
+The maximum attack value is 960 for a weapon with a rarity number of 6
+The maximum attack value is 1056 for a weapon with a rarity number of 7
+The maximum attack value is 1008 for a weapon with a rarity number of 8
+
+Genshin Calculations:
+The minimum base attack value is 39 for a weapon with a rarity number of 4
+The minimum base attack value is 38 for a weapon with a rarity number of 3
+The minimum base attack value is 44 for a weapon with a rarity number of 5
+The minimum base attack value is 23 for a weapon with a rarity number of 1
+The minimum base attack value is 33 for a weapon with a rarity number of 2
